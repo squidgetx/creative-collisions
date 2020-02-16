@@ -6,7 +6,6 @@ let users = {};
 // Listen for confirmation of connection
 socket.on('connect', function() {
 	console.log('Connected');
- 
   socket.on('userList', (message) => {
     users = message
     if (gameState == 'WAITING') {
@@ -20,8 +19,9 @@ let canClick = false;
 let ranNum;
 let result = '';
 let count = 0;
+let MAXTIME = 30
 
-let sec = 5;
+let sec = MAXTIME;
 // WAITING, INGAME, FINISHED
 let gameState = 'WAITING';
 let loseArr = [];
@@ -47,8 +47,6 @@ function setup() {
 				count += 1;
 			}
 		}
-
-		count == ranNum ? (result = `Wow`) : (result = `Uh Oh`);
 	});
 }
 
@@ -76,9 +74,9 @@ function buttonPressed() {
       if (sec < 0) {
         clearInterval(timer);
         canClick = false;
-        sec = 5;
+        sec = MAXTIME;
         gameState = 'FINISHED'
-        replaceText()
+        displayTextString  = `${count} clickers, ${Object.keys(users).length - count} non clickers`
         startButton.html('continue')
       }
       socket.emit('click', canClick);
@@ -94,7 +92,7 @@ function buttonPressed() {
 
 function randomNum() {
 	ranNum = floor(random(2, Object.keys(users).length));
-	displayTextString = `In this game, ${ranNum} people have to click their phone`;
+	displayTextString = `To click or not to click, that is the question.`
 }
 
 function replaceText() {
