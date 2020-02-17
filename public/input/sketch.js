@@ -38,14 +38,14 @@ function drawButtons(){
 	textSize(80)
 	fill(0)
 	rect(0,0,width,height/2)
-	text("🔎",(windowWidth/2)-20,windowHeight/4)
-	text("🔄",(windowWidth/2)-20,3*windowHeight/4)
+	text("🔎",(windowWidth/2)-40,windowHeight/4)
+	text("🔄",(windowWidth/2)-40,3*windowHeight/4)
 }
 
 function drawFeedBackButtons(){
 	background(0)
-	text("🔎",(windowWidth/2)-20,windowHeight/4)
-	text("🔄",(windowWidth/2)-20,3*windowHeight/4)
+	text("🔎",(windowWidth/2)-40,windowHeight/4)
+	text("🔄",(windowWidth/2)-40,3*windowHeight/4)
 }
 
 function touchStarted() {
