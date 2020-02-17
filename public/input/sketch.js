@@ -19,7 +19,8 @@ let timeInSec = 10;
 
 function setup() {
 	createCanvas(windowWidth, windowHeight);
-	background(255);
+	// background(255);
+	drawButtons()
 
 	socket.on('click', (data) => {
 		// console.log(data);
@@ -32,23 +33,46 @@ function setup() {
 	});
 }
 
+function drawButtons(){
+	background(255)
+	textSize(80)
+	fill(0)
+	rect(0,0,width,height/2)
+	text("🔎",(windowWidth/2)-20,windowHeight/4)
+	text("🔄",(windowWidth/2)-20,3*windowHeight/4)
+}
+
+function drawFeedBackButtons(){
+	background(0)
+	text("🔎",(windowWidth/2)-20,windowHeight/4)
+	text("🔄",(windowWidth/2)-20,3*windowHeight/4)
+}
+
 function touchStarted() {
 	if (touched == false && canTouch == true) {
 
-		value += 1;
-		if (value > 2){
-			value = 0
+		if (mouseY > windowHeight/2){
+			drawFeedBackButtons()
+			value += 1;
+			if (value > 2){
+				value = 0
+			}
+			socket.emit('inputValue', value);
+		} else {
+			showColorValue();
 		}
-		changeColorValue();
 
-		socket.emit('inputValue', value);
 		// touched = true;
 	}
 	//prevent default;
 	return false;
 }
 
-function changeColorValue() {
+function touchEnded(){
+	drawButtons()
+}
+
+function showColorValue() {
 	// r = Math.floor(Math.random() * 255);
 	// g = Math.floor(Math.random() * 255);
 	// b = Math.floor(Math.random() * 255);
