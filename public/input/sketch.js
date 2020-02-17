@@ -10,7 +10,8 @@ socket.on('connect', () => {
 // value = 1 green
 // value = 2 blue
 let value = 0;
-let r, g, b;
+// let r, g, b;
+let color;
 let touched = false;
 let canTouch = false;
 
@@ -48,24 +49,18 @@ function touchStarted() {
 }
 
 function changeColorValue() {
-	r = Math.floor(Math.random() * 255);
-	g = Math.floor(Math.random() * 255);
-	b = Math.floor(Math.random() * 255);
+	// r = Math.floor(Math.random() * 255);
+	// g = Math.floor(Math.random() * 255);
+	// b = Math.floor(Math.random() * 255);
 
 	if (value == 0){
-		r=247
-		g=57
-		b=79
+		color = "#F7394F"
 	} else if (value == 1){
-		r=126
-		g=240
-		b=122
+		color = "#427EF5"
 	} else {
-		r=66
-		g=126
-		b=245
+		color = "#7EF07A"
 	}
-	background(r, g, b);
+	background(color);
 }
 
 function resetGame() {
