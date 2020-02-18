@@ -40,11 +40,24 @@ function setup() {
     users[id] = {
       value : data
     };
+		// value = 0 red
+		// value = 1 green
+		// value = 2 blue
+
+		redCount = 0
+		greenCount = 0
+		blueCount = 0
+
 
 		count = 0;
 		for (id in users) {
-			if (users[id].value == 1) {
-				count += 1;
+			if (users[id].value == 0) {
+				// count += 1;
+				redCount += 1
+			} else if (users[id].value == 1){
+				greenCount += 1
+			} else if (users[id].value == 2){
+				blueCount += 1
 			}
 		}
 	});
@@ -76,8 +89,9 @@ function buttonPressed() {
         canClick = false;
         sec = MAXTIME;
         gameState = 'FINISHED'
-        displayTextString  = `${count} clickers, ${Object.keys(users).length - count} non clickers`
-        startButton.html('continue')
+        // displayTextString  = `${count} clickers, ${Object.keys(users).length - count} non clickers`
+				displayTextString = `${redCount} Red, ${greenCount} Green, ${blueCount} Blue`
+				startButton.html('continue')
       }
       socket.emit('click', canClick);
       console.log(sec);
@@ -107,4 +121,3 @@ function replaceText() {
 		displayTextString = loseArr[Math.floor(random(2))];
 	}
 }
-
