@@ -55,7 +55,6 @@ function setup() {
 		greenCount = 0
 		blueCount = 0
 
-
 		count = 0;
 		for (id in users) {
 			if (users[id].value == 0) {
@@ -91,7 +90,10 @@ function buttonPressed() {
 
     gameState = 'INGAME';
     socket.emit('gameState', gameState)
-    randomNum();
+    document.body.style.backgroundColor = 'black'
+    displayText.style('color', 'white')
+  	displayTextString = "Red, green or blue? It's up to you." 
+
     let timer = setInterval(() => {
       sec--;
       canClick = true;
@@ -109,17 +111,14 @@ function buttonPressed() {
       console.log(sec);
     }, 1000);
   } else { // FINISHED
+    document.body.style.backgroundColor = 'white'
+    displayText.style('color', 'black')
+
     startButton.html('start game')
     gameState = 'WAITING'
     socket.emit('gameState', gameState)
     displayTextString = `${Object.keys(users).length} connected`
   }
-}
-
-
-function randomNum() {
-	ranNum = floor(random(2, Object.keys(users).length));
-	displayTextString = "Red, green or blue? It's up to you." 
 }
 
 function replaceText() {

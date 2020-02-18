@@ -14,7 +14,6 @@ let outputs = io.of('/output');
 outputs.on('connection', (socket) => {
 	console.log('An output client connected: ' + socket.id);
   outputs.emit('userList', users)
-  socket.emit('userList', users)
 
 	socket.on('gameState', (data) => {
 		console.log(data);
