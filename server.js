@@ -14,10 +14,11 @@ let activeSocketID
 
 let outputs = io.of('/output');
 outputs.on('connection', (socket) => {
-	console.log('An output client connected: ' + socket.id);
   
   numOutputs += 1
+	console.log('output client #' + numOutputs + ' connected: ' + socket.id);
   if (numOutputs == 1) {
+    console.log('new active socket created')
     activeSocketID = socket.id
   }
   
@@ -33,9 +34,13 @@ outputs.on('connection', (socket) => {
     gameState = data
 		inputs.emit('gameState', data);
 	});
+
   socket.on('disconnect', () => {
     console.log('An output client has disconnected ' + socket.id);
-    numOutputs--
+    if (socket.id == activeSocketID) {
+      numOutputs = 0;
+      console.log('lost main')
+    }
   });
 	
 });
