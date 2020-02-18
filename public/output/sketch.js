@@ -2,6 +2,13 @@
 let socket = io('/output');
 let displayTextString = '';
 let users = {};
+let redCount = greenCount = blueCount = 0;
+
+let song;
+
+function preload() {
+  song = loadSound('/output/distrust.mp3')
+}
 
 // Listen for confirmation of connection
 socket.on('connect', function() {
@@ -73,11 +80,14 @@ function draw() {
 }
 
 function buttonPressed() {
+  userStartAudio()
   if (gameState === 'INGAME') {
     // do nothing
     console.log('game already started')
     return;
   } else if (gameState === 'WAITING') {
+    // play the sound!
+    song.play();
 
     gameState = 'INGAME';
     randomNum();
@@ -92,6 +102,8 @@ function buttonPressed() {
         // displayTextString  = `${count} clickers, ${Object.keys(users).length - count} non clickers`
 				displayTextString = `${redCount} Red, ${greenCount} Green, ${blueCount} Blue`
 				startButton.html('continue')
+        console.log("stop")
+        song.stop();
       }
       socket.emit('click', canClick);
       console.log(sec);
