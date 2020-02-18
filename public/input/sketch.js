@@ -1,48 +1,41 @@
 
-
-// touch then change background color, value = 1
-// after touch can't change value anymore / background until timer stops
 // value = 0 red
 // value = 1 green
 // value = 2 blue
 let value = 0;
-// let r, g, b;
-let color;
 let touched = false;
 let prevGameState = '';
 let gameState = 'WAITING'
 
-let timeInSec = 10;
-
 // Open and connect input socket
+// Process gamestate messages right away
 let socket = io('/input');
 socket.on('connect', (s) => {
   console.log('Connected');
   socket.on('gameState', (data) => {
     gameState = data;
     console.log(data)
-    // Send value when the game begins so that people
-    // who never swap are counted
-    if (data === 'INGAME') {
-		  socket.emit('inputValue', value);
-    }
   })
 });
 
 function setup() {
 	createCanvas(windowWidth, windowHeight);
-	}
+}
 
 function draw() {
-  // put redraw logic here otherwise p5 complains
+  // when the game state has changed, update the UI
+  // this also means that if you join mid-game you automatically show the correct UI
   if (prevGameState !== gameState) {
     console.log('gamestate changed', prevGameState, gameState)
     if (gameState === 'WAITING') {
       drawWaiting()
     } else if (gameState === 'INGAME') {
       resetGame()
+      // Send value when the game begins so that people
+      // who never swap are counted
+      socket.emit('inputValue', value);
     } else if (gameState === 'FINISHED') {
-      showColor()
+      showColorValue()
     }
   }
   prevGameState = gameState;
@@ -57,7 +50,7 @@ function drawWaiting() {
     pop()
 }
 
-function drawButtons(){
+function drawButtons() {
 	background(255)
 	textSize(80)
 	fill(0)
@@ -66,12 +59,13 @@ function drawButtons(){
 	text("🔄",(windowWidth/2)-40,3*windowHeight/4)
 }
 
-function drawFeedBackButtons(){
+function drawFeedBackButtons() {
 	background(0)
 	text("🔎",(windowWidth/2)-40,windowHeight/4)
 	text("🔄",(windowWidth/2)-40,3*windowHeight/4)
 }
 
+// only accept input if you are in the game
 function touchStarted() {
   console.log(gameState)
   if (gameState === 'INGAME') {
@@ -96,10 +90,7 @@ function touchEnded(){
 }
 
 function showColorValue() {
-	// r = Math.floor(Math.random() * 255);
-	// g = Math.floor(Math.random() * 255);
-	// b = Math.floor(Math.random() * 255);
-
+  let color;
 	if (value == 0){
 		color = "#F7394F"
 	} else if (value == 1){
@@ -113,8 +104,4 @@ function showColorValue() {
 function resetGame() {
   drawButtons();
   value = 0;
-}
-
-function showColor() {
-  showColorValue()
 }

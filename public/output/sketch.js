@@ -3,8 +3,8 @@ let socket = io('/output');
 let displayTextString = '';
 let users = {};
 let redCount = greenCount = blueCount = 0;
-
 let song;
+let id = 0;
 
 function preload() {
   song = loadSound('/output/distrust.mp3')
@@ -19,20 +19,18 @@ socket.on('connect', function() {
       displayTextString = `${Object.keys(users).length} connected`
     }
   })
-
+  socket.on('outputID', (message) => {
+    id = message
+  })
 });
 
-let canClick = false;
-let ranNum;
-let result = '';
-let count = 0;
 let MAXTIME = 30
 
 let sec = MAXTIME;
 // WAITING, INGAME, FINISHED
 let gameState = 'WAITING';
-let loseArr = [];
 let startButton;
+let displayText;
 
 function setup() {
 	displayText = createP('');
@@ -55,7 +53,6 @@ function setup() {
 		greenCount = 0
 		blueCount = 0
 
-		count = 0;
 		for (id in users) {
 			if (users[id].value == 0) {
 				// count += 1;
@@ -71,10 +68,13 @@ function setup() {
 
 function draw() {
   displayText.html(displayTextString);
-  if (gameState === 'INGAME') {
+  if (gameState === 'INGAME' || id != 1) {
     startButton.attribute('disabled', true)
   } else {
     startButton.removeAttribute('disabled')
+  }
+  if (id != 1) {
+    displayTextString = 'game already in progress'
   }
 }
 
@@ -96,10 +96,8 @@ function buttonPressed() {
 
     let timer = setInterval(() => {
       sec--;
-      canClick = true;
       if (sec < 0) {
         clearInterval(timer);
-        canClick = false;
         sec = MAXTIME;
         gameState = 'FINISHED'
         socket.emit('gameState', gameState)
@@ -119,17 +117,4 @@ function buttonPressed() {
     socket.emit('gameState', gameState)
     displayTextString = `${Object.keys(users).length} connected`
   }
-}
-
-function replaceText() {
-	if (count === ranNum) {
-		displayTextString = `${result}, you guys finally made it!!`;
-	} else {
-    loseArr = [
-			`${result} y'all failed, ${count} people clicked`,
-			`Only ${count} people clicked this time, try it again!`,
-			`Hmm, not good, ${count} people clicked`
-		];
-		displayTextString = loseArr[Math.floor(random(2))];
-	}
 }

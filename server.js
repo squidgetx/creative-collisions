@@ -8,22 +8,36 @@ let server = require('http').createServer(app).listen(port, function() {
 app.use(express.static('public'));
 let io = require('socket.io').listen(server);
 let users = {}
+let numOutputs = 0
 let gameState = 'WAITING'
+let activeSocketID
 
 let outputs = io.of('/output');
 outputs.on('connection', (socket) => {
 	console.log('An output client connected: ' + socket.id);
+  
+  numOutputs += 1
+  if (numOutputs == 1) {
+    activeSocketID = socket.id
+  }
+  
+  // send the connected output the list of users
   outputs.emit('userList', users)
+  
+  // send the connected socket it's ID (ID = 1 means active, all others will be disabled)
+  socket.emit('outputID', numOutputs)
 
+  // when the output signals the game has begun/end tell all the inputs
 	socket.on('gameState', (data) => {
 		console.log(data);
     gameState = data
 		inputs.emit('gameState', data);
 	});
-
-	socket.on('disconnect', () => {
-		console.log('An output client has disconnected ' + socket.id);
-	});
+  socket.on('disconnect', () => {
+    console.log('An output client has disconnected ' + socket.id);
+    numOutputs--
+  });
+	
 });
 
 let inputs = io.of('/input');
@@ -32,8 +46,15 @@ inputs.on('connection', (socket) => {
 
   // add a user 
   users[socket.id] = {}
+  
+  // tell the output a new user joined
   outputs.emit('userList', users)
+  
+  // tell the new input what part of the game we are in
   socket.emit('gameState', gameState)
+  
+  // when the input tells us what color it chose, send it to the output
+  // so the output can tally the color counts
 	socket.on('inputValue', (data) => {
 		let message = {
 			id   : socket.id,
@@ -42,10 +63,13 @@ inputs.on('connection', (socket) => {
 		outputs.emit('inputValue', message);
 	});
 
+  // remove the input user from server memory when disconnected
+  // and update any outputs
 	socket.on('disconnect', function() {
 		console.log('An input client has disconnected ' + socket.id);
     delete users[socket.id]
     outputs.emit('userList', users)
 		outputs.emit('disconnected', socket.id);
 	});
+  
 });
