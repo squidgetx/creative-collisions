@@ -90,6 +90,7 @@ function buttonPressed() {
     song.play();
 
     gameState = 'INGAME';
+    socket.emit('gameState', gameState)
     randomNum();
     let timer = setInterval(() => {
       sec--;
@@ -99,18 +100,18 @@ function buttonPressed() {
         canClick = false;
         sec = MAXTIME;
         gameState = 'FINISHED'
-        // displayTextString  = `${count} clickers, ${Object.keys(users).length - count} non clickers`
-				displayTextString = `${redCount} Red, ${greenCount} Green, ${blueCount} Blue`
+        socket.emit('gameState', gameState)
+				displayTextString = `Red: ${redCount}, Green: ${greenCount}, Blue: ${blueCount}`
 				startButton.html('continue')
         console.log("stop")
         song.stop();
       }
-      socket.emit('click', canClick);
       console.log(sec);
     }, 1000);
   } else { // FINISHED
     startButton.html('start game')
     gameState = 'WAITING'
+    socket.emit('gameState', gameState)
     displayTextString = `${Object.keys(users).length} connected`
   }
 }
@@ -118,7 +119,7 @@ function buttonPressed() {
 
 function randomNum() {
 	ranNum = floor(random(2, Object.keys(users).length));
-	displayTextString = `To click or not to click, that is the question.`
+	displayTextString = "Red, green or blue? It's up to you." 
 }
 
 function replaceText() {

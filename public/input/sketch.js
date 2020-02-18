@@ -1,8 +1,4 @@
-// Open and connect input socket
-let socket = io('/input');
-socket.on('connect', () => {
-	console.log('Connected');
-});
+
 
 // touch then change background color, value = 1
 // after touch can't change value anymore / background until timer stops
@@ -13,24 +9,47 @@ let value = 0;
 // let r, g, b;
 let color;
 let touched = false;
-let canTouch = false;
+let prevGameState = '';
+let gameState = 'WAITING'
 
 let timeInSec = 10;
 
+// Open and connect input socket
+let socket = io('/input');
+socket.on('connect', (s) => {
+  console.log('Connected');
+  socket.on('gameState', (data) => {
+    gameState = data;
+    console.log(data)
+  })
+});
+
 function setup() {
 	createCanvas(windowWidth, windowHeight);
-	// background(255);
-	drawButtons()
+	}
 
-	socket.on('click', (data) => {
-		// console.log(data);
-		if (data === true) {
-			canTouch = true;
-		} else {
-			resetGame();
-		}
-		console.log(canTouch);
-	});
+function draw() {
+  // put redraw logic here otherwise p5 complains
+  if (prevGameState !== gameState) {
+    console.log('gamestate changed', prevGameState, gameState)
+    if (gameState === 'WAITING') {
+      drawWaiting()
+    } else if (gameState === 'INGAME') {
+      resetGame()
+    } else if (gameState === 'FINISHED') {
+      showColor()
+    }
+  }
+  prevGameState = gameState;
+}
+
+function drawWaiting() {
+    push()
+    background(255)
+    textSize(80)
+    textAlign(CENTER)
+	  text("waiting for game to begin...",windowWidth/2,windowHeight/2)
+    pop()
 }
 
 function drawButtons(){
@@ -49,8 +68,8 @@ function drawFeedBackButtons(){
 }
 
 function touchStarted() {
-	if (touched == false && canTouch == true) {
-
+  console.log(gameState)
+  if (gameState === 'INGAME') {
 		if (mouseY > windowHeight/2){
 			drawFeedBackButtons()
 			value += 1;
@@ -61,15 +80,14 @@ function touchStarted() {
 		} else {
 			showColorValue();
 		}
-
-		// touched = true;
-	}
-	//prevent default;
+  }
 	return false;
 }
 
 function touchEnded(){
-	drawButtons()
+  if (gameState === 'INGAME') {
+	  drawButtons()
+  }
 }
 
 function showColorValue() {
@@ -88,7 +106,10 @@ function showColorValue() {
 }
 
 function resetGame() {
-	canTouch = false;
-	touched = false;
-	background(255);
+  drawButtons();
+  value = 0;
+}
+
+function showColor() {
+  showColorValue()
 }

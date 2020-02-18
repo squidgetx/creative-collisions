@@ -8,6 +8,7 @@ let server = require('http').createServer(app).listen(port, function() {
 app.use(express.static('public'));
 let io = require('socket.io').listen(server);
 let users = {}
+let gameState = 'WAITING'
 
 let outputs = io.of('/output');
 outputs.on('connection', (socket) => {
@@ -15,9 +16,10 @@ outputs.on('connection', (socket) => {
   outputs.emit('userList', users)
   socket.emit('userList', users)
 
-	socket.on('click', (data) => {
+	socket.on('gameState', (data) => {
 		console.log(data);
-		inputs.emit('click', data);
+    gameState = data
+		inputs.emit('gameState', data);
 	});
 
 	socket.on('disconnect', () => {
@@ -32,7 +34,7 @@ inputs.on('connection', (socket) => {
   // add a user 
   users[socket.id] = {}
   outputs.emit('userList', users)
-
+  socket.emit('gameState', gameState)
 	socket.on('inputValue', (data) => {
 		let message = {
 			id   : socket.id,
