@@ -26,7 +26,7 @@ let canClick = false;
 let ranNum;
 let result = '';
 let count = 0;
-let MAXTIME = 30
+let MAXTIME = 90
 
 let sec = MAXTIME;
 // WAITING, INGAME, FINISHED
@@ -113,7 +113,6 @@ function buttonPressed() {
   } else { // FINISHED
     document.body.style.backgroundColor = 'white'
     displayText.style('color', 'black')
-
     startButton.html('start game')
     gameState = 'WAITING'
     socket.emit('gameState', gameState)
