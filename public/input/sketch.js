@@ -21,6 +21,11 @@ socket.on('connect', (s) => {
   socket.on('gameState', (data) => {
     gameState = data;
     console.log(data)
+    // Send value when the game begins so that people
+    // who never swap are counted
+    if (data === 'INGAME') {
+		  socket.emit('inputValue', value);
+    }
   })
 });
 
